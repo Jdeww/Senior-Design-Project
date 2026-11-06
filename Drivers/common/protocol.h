@@ -79,6 +79,10 @@
 
 #define EVENT_FIFO_DEPTH            16u     /* entries of [index][value]     */
 
+/* Reading REG_EVENTS: the master ACKs every value byte, which is what removes
+ * that event from the FIFO. If any events were read, it then reads one extra
+ * byte and NACKs it to end the read. */
+
 /* ------------------------------------------------------------------------ */
 /* Input types                                                              */
 /* ------------------------------------------------------------------------ */

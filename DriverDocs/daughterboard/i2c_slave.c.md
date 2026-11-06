@@ -125,7 +125,11 @@ The queue holds 16 `[index][value]` entries and is safe to share between the mai
 - Only the interrupt writes `s_fifo_tail`.
 - Both are free-running 8-bit counters, so `head - tail` is always the count, even after they wrap. `counter & 15` gives the slot.
 
-A read that begins at `REG_EVENTS` sends the count first, then each index and value. An event is removed when its value byte is loaded into the hardware. A read that stops between an index and its value keeps that event. A value byte that is loaded but never reaches the motherboard is lost.
+A read that begins at `REG_EVENTS` sends the count first, then each index and value. `next_stream_byte()` runs only after the motherboard ACKs the previous byte, and it removes an event once its value byte has been ACKed. If a read fails at any point, the unconfirmed event stays queued and is sent again on the next poll.
+
+The motherboard ends the read by NACKing one extra byte after the last value. That byte is 0xFF, or the next event's index if more are queued. Either way, the NACK means nothing further is removed.
+
+If the motherboard's ACK after a value byte gets corrupted on the bus, the event stays queued and is sent twice. See [daughter_protocol.c](../motherboard/daughter_protocol.c.md) for what that means for the caller.
 
 ### Message validation
 

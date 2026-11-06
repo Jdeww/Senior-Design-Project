@@ -61,3 +61,4 @@ dp_read_info(next_position, &info)   confirms the board moved to its new address
 | `dp_read_reply()` | `I2C_BAD_DATA` | Restart enumeration, since all the retries failed |
 | Reads from a position | `I2C_NACK` | Count toward `NACK_LIMIT` (2 in a row triggers re-enumeration) |
 | `dp_reset_chain()` | `I2C_NACK` | Expect this when no boards are connected |
+| `dp_read_events()` | Any error | Process the first `*count` events anyway, because the daughter has already removed them |

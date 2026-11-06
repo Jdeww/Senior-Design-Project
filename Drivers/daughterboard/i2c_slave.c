@@ -47,6 +47,7 @@ static uint8_t s_reply_idx;
 static uint8_t s_reg;
 static bool    s_in_stream;
 static bool    s_stream_on_value;
+static bool    s_stream_value_sent;
 static uint8_t s_stream_left;
 
 /* Fixed at init. */
@@ -112,13 +113,18 @@ static uint8_t read_register(uint8_t reg)
     }
 }
 
-/* An event leaves the FIFO only once its value byte has been loaded, so a read
- * that stops between index and value does not lose it. */
+/* Called only after the master ACKs the previous byte. An event leaves the FIFO
+ * once its value byte has been ACKed, so a read that fails at any point leaves
+ * the unconfirmed event queued to be sent again on the next poll. */
 static uint8_t next_stream_byte(void)
 {
     uint8_t slot;
-    uint8_t out;
 
+    if (s_stream_value_sent) {
+        s_stream_value_sent = false;
+        s_fifo_tail = (uint8_t)(s_fifo_tail + 1u);
+        s_stream_left--;
+    }
     if (s_stream_left == 0u) {
         return READ_PAD;
     }
@@ -127,11 +133,9 @@ static uint8_t next_stream_byte(void)
         s_stream_on_value = true;
         return s_fifo_index[slot];
     }
-    out = s_fifo_value[slot];
-    s_fifo_tail = (uint8_t)(s_fifo_tail + 1u);
-    s_stream_left--;
     s_stream_on_value = false;
-    return out;
+    s_stream_value_sent = true;
+    return s_fifo_value[slot];
 }
 
 static uint8_t next_read_byte(void)
@@ -166,6 +170,7 @@ static void begin_read(void)
         if (s_reg == REG_EVENTS) {
             s_in_stream = true;
             s_stream_on_value = false;
+            s_stream_value_sent = false;
             s_stream_left = (uint8_t)(s_fifo_head - s_fifo_tail);
             SSP1BUF = s_stream_left;
             SSP1CON1bits.CKP = 1;

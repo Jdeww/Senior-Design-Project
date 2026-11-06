@@ -122,7 +122,8 @@ i2c_status_t dp_read_events(uint8_t pos, dp_event_t *events, uint8_t max, uint8_
     i2c_status_t status;
     uint8_t available = 0u;
     uint8_t wanted;
-    uint8_t i;
+    uint8_t received = 0u;
+    uint8_t trailing;
 
     *count = 0u;
     if (!pos_is_valid(pos)) {
@@ -148,25 +149,41 @@ i2c_status_t dp_read_events(uint8_t pos, dp_event_t *events, uint8_t max, uint8_
     }
     status = i2c_acknowledge(wanted > 0u);
 
-    for (i = 0u; (status == I2C_OK) && (i < wanted); i++) {
-        status = i2c_receive(&events[i].index);
+    /* The ACK after a value byte tells the daughter it can remove that event,
+     * so an event only counts as received once that ACK has gone out. */
+    while ((status == I2C_OK) && (received < wanted)) {
+        status = i2c_receive(&events[received].index);
         if (status == I2C_OK) {
             status = i2c_acknowledge(true);
         }
         if (status == I2C_OK) {
-            status = i2c_receive(&events[i].value);
+            status = i2c_receive(&events[received].value);
         }
         if (status == I2C_OK) {
-            status = i2c_acknowledge((uint8_t)(i + 1u) < wanted);
+            status = i2c_acknowledge(true);
+        }
+        if (status == I2C_OK) {
+            received++;
+        }
+    }
+
+    /* Every value byte was ACKed, so the read has to end on one extra byte. It
+     * gets the NACK and its contents are ignored. */
+    if ((status == I2C_OK) && (wanted > 0u)) {
+        status = i2c_receive(&trailing);
+        if (status == I2C_OK) {
+            status = i2c_acknowledge(false);
         }
     }
     if (status == I2C_OK) {
         status = i2c_stop();
     }
+
+    /* Report what arrived even on an error: the daughter has already removed
+     * these events and will not send them again. */
+    *count = received;
     if (status != I2C_OK) {
         return i2c_abort(status);
     }
-
-    *count = wanted;
     return (available > EVENT_FIFO_DEPTH) ? I2C_BAD_DATA : I2C_OK;
 }

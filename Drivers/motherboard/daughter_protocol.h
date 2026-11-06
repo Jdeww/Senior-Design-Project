@@ -50,7 +50,10 @@ i2c_status_t dp_read_info(uint8_t pos, dp_info_t *info);
 i2c_status_t dp_read_snapshot(uint8_t pos, uint8_t input, uint8_t *value);
 
 /* Reads up to max events into events[] and sets *count. Events beyond max stay
- * in the daughter's FIFO for the next poll. */
+ * in the daughter's FIFO for the next poll.
+ *
+ * *count is valid even when this returns an error: process those events first,
+ * because the daughter has already removed them and will not send them again. */
 i2c_status_t dp_read_events(uint8_t pos, dp_event_t *events, uint8_t max, uint8_t *count);
 
 #endif /* DAUGHTER_PROTOCOL_H */

@@ -63,8 +63,17 @@ The daughter sends a count followed by that many `[index][value]` pairs. The num
    - count above `EVENT_FIFO_DEPTH` (16): 0, because the count must be corrupt
    - otherwise: the smaller of the count and `max`
 4. Sends ACK if any events are wanted, or NACK if none are. The usual case of no events costs only this one byte.
-5. Reads each index and value, acknowledging every byte except the last.
-6. Sends STOP and sets `*count`.
+5. Reads each index and value, sending ACK after every byte. An event counts as received once the ACK after its value byte has gone out.
+6. If any events were wanted, reads one extra byte, ignores it and sends NACK to end the read.
+7. Sends STOP and sets `*count`.
+
+The extra byte exists because the ACK after a value byte is what tells the daughter to remove that event. If the last value byte got the NACK instead, the daughter couldn't tell a normal end of read from a released or disconnected line.
+
+For example, one event (key 5 pressed) looks like this, with the motherboard's response in brackets:
+
+```text
+01 [ACK]  05 [ACK]  01 [ACK]  FF [NACK]  STOP
+```
 
 | Situation | Result |
 |---|---|
@@ -72,6 +81,8 @@ The daughter sends a count followed by that many `[index][value]` pairs. The num
 | No events | `I2C_OK`; `*count` is 0 |
 | More events than `max` | `I2C_OK`; the extras stay on the daughter for the next poll |
 | Corrupt count | `I2C_BAD_DATA`; `*count` is 0 and no events are taken |
-| Bus error | The error, after cleanup; `*count` is 0 |
+| Bus error | The error, after cleanup; `*count` is the number fully received before the failure |
 
-Events carry no integrity check, unlike the HELLO reply. If a read fails partway through, events the daughter has already removed from its queue are lost, because `*count` stays 0.
+After a bus error, the caller must still process the first `*count` events, because the daughter has already removed them. An event that was not confirmed stays on the daughter and is sent again on the next poll.
+
+Events carry no integrity check, unlike the HELLO reply. If the motherboard's ACK after a value byte gets corrupted on the bus, the daughter sends that event again, so it arrives twice. A repeated key event does little harm, but a repeated encoder count would add an extra step.
