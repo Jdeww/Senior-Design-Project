@@ -28,7 +28,7 @@
 #define I2C_ADDR_DISCOVERY          0x2Fu   /* unregistered daughters        */
 #define I2C_ADDR_POS_BASE           0x30u   /* registered: 0x30 + position   */
 
-#define CHAIN_MAX_POSITIONS         8u      /* positions 1..8 = 0x31..0x38   */
+#define CHAIN_MAX_POSITIONS         4u      /* positions 1..4 = 0x31..0x34   */
 #define POSITION_MOTHERBOARD        0u      /* reserved for the main board   */
 
 #define I2C_ADDR_FOR_POS(pos)       ((uint8_t)(I2C_ADDR_POS_BASE + (pos)))
