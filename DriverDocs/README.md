@@ -2,7 +2,7 @@
 
 One page for each `.c` and `.h` file in `Drivers/`, in the same folder layout. Each page covers what the file does, its inputs and outputs, and how it works.
 
-**Status:** both firmwares build for the PIC18LF25K50 with XC8 v4.00. Nothing has run on hardware yet. In the simulator, the tick and main loops ran with the clock wait skipped, but the I2C drivers have not run at all. Each page's Testing section, where it has one, gives the details. Remaining work is in the [to-do list](TODO.md).
+**Status:** both firmwares build for the PIC18LF25K50 with XC8 v4.00. Nothing has run on hardware yet. In the simulator, the tick ran with the clock wait skipped, and the enumerator and database ran against fake boards, but the I2C drivers have not run at all. Each page's Testing section, where it has one, gives the details. Remaining work is in the [to-do list](TODO.md).
 
 ## Files
 
@@ -11,10 +11,16 @@ One page for each `.c` and `.h` file in `Drivers/`, in the same folder layout. E
 | [common/protocol.h](common/protocol.h.md) | Both boards | Addresses, message bytes, registers and timings that both boards must agree on |
 | [common/clock.h](common/clock.h.md) | Both boards | Public interface of oscillator startup |
 | [common/clock.c](common/clock.c.md) | Both boards | Sets the configuration bits and starts the oscillator |
+| [common/eeprom.h](common/eeprom.h.md) | Both boards | Public interface of the data EEPROM |
+| [common/eeprom.c](common/eeprom.c.md) | Both boards | Reads and writes EEPROM bytes, skipping unchanged ones |
 | [common/system_tick.h](common/system_tick.h.md) | Both boards | Public interface of the 1 ms time base |
 | [common/system_tick.c](common/system_tick.c.md) | Both boards | Runs Timer2 and counts milliseconds in `g_ms` |
 | [motherboard/board.h](motherboard/board.h.md) | Motherboard | Clock speed and I2C pins |
 | [motherboard/main.c](motherboard/main.c.md) | Motherboard | Startup, interrupt handler and main loop |
+| [motherboard/chain.h](motherboard/chain.h.md) | Motherboard | Public interface of the chain enumerator |
+| [motherboard/chain.c](motherboard/chain.c.md) | Motherboard | Registers boards in order and decides ACCEPT or REGENERATE |
+| [motherboard/daughter_db.h](motherboard/daughter_db.h.md) | Motherboard | Public interface of the daughter database |
+| [motherboard/daughter_db.c](motherboard/daughter_db.c.md) | Motherboard | Stores the motherboard ID and seen boards in EEPROM |
 | [motherboard/i2c_master.h](motherboard/i2c_master.h.md) | Motherboard | Public interface of the I2C master, including status codes |
 | [motherboard/i2c_master.c](motherboard/i2c_master.c.md) | Motherboard | Drives the bus using the MSSP hardware and recovers a stuck bus |
 | [motherboard/daughter_protocol.h](motherboard/daughter_protocol.h.md) | Motherboard | Public interface for talking to daughter boards |
@@ -31,7 +37,9 @@ One page for each `.c` and `.h` file in `Drivers/`, in the same folder layout. E
 ```text
 MOTHERBOARD                                 DAUGHTER BOARD
 
-main.c, then enumerator (not written)       main.c, then input drivers (not written)
+main.c                                      main.c, then input drivers (not written)
+        |                                           |
+chain.c  <-->  daughter_db.c                        |
         |                                           |
 daughter_protocol.c                         i2c_slave.c  <-->  identity_stub.c (temporary)
         |                                           |
@@ -59,7 +67,7 @@ Each firmware is its own build, with its own board folder on the include path.
 
 | Firmware | Source files | Include paths |
 |---|---|---|
-| Motherboard | `motherboard/main.c`, `i2c_master.c`, `daughter_protocol.c`, `common/clock.c`, `common/system_tick.c` | `Drivers/motherboard`, `Drivers/common` |
+| Motherboard | `motherboard/main.c`, `chain.c`, `daughter_db.c`, `daughter_protocol.c`, `i2c_master.c`, `common/clock.c`, `common/eeprom.c`, `common/system_tick.c` | `Drivers/motherboard`, `Drivers/common` |
 | Daughter | `daughterboard/main.c`, `i2c_slave.c`, `identity_stub.c`, `common/clock.c`, `common/system_tick.c` | `Drivers/daughterboard`, `Drivers/common` |
 
 To build the scope test, also define `BRINGUP_TICK_PIN`.
@@ -73,7 +81,7 @@ To build the scope test, also define `BRINGUP_TICK_PIN`.
 
 ## Not written yet
 
-- **Chain enumerator and daughter database:** run the handshake on the motherboard using `daughter_protocol`.
+- **Polling and module manager:** collect events from each board and handle boards that drop out.
 - **USB driver:** sends reports to the PC.
 - **Real identity storage:** replaces `identity_stub.c` with EEPROM storage and real random IDs.
 - **Input detection and input drivers:** read the ID resistor and the keys, encoder, slider or switches on each daughter.

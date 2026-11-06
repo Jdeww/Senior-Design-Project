@@ -26,16 +26,14 @@ These need the schematic or datasheet, and getting them wrong could stop a board
 
 ### Motherboard
 
-- [ ] **Chain enumerator.** Runs RESET_CHAIN, then HELLO, reply, decision and ACCEPT for each board.
-  - Stop at position 4, and skip the 100 ms HELLO when the chain is full, so a fifth board just stays unregistered.
-  - Treat a NACK from `dp_hello()` as the normal end of the chain.
-  - Reject the reserved IDs 0x0000 and 0xFFFF, because `dp_read_reply()` accepts them if the complement bytes match.
-  - Wait `GATE_SETTLE_MS` after ACCEPT, then confirm the board with `dp_read_info()`.
-- [ ] **Daughter database.** Stores seen boards in EEPROM and makes the ACCEPT or REGENERATE decision.
+- [x] **Chain enumerator.** Written and tested against fake boards. See [chain.c](motherboard/chain.c.md).
+- [x] **Daughter database.** Written and tested in the simulator. See [daughter_db.c](motherboard/daughter_db.c.md).
 - [ ] **Polling schedule.** Polls each position every 5 ms from `main.c`.
   - When `dp_read_events()` returns an error, still process the first `*count` events before handling the error. The daughter has already removed them and won't send them again.
 - [ ] **Module manager.** Counts NACKs toward `NACK_LIMIT`, sends key releases and detach reports for a board that drops out, then re-enumerates.
 - [ ] **USB driver.** The HID reports, report queue and event aggregator, connected to `main.c`.
+  - Send the chain reset, attach and chain complete reports from the table in `chain.c`, which doesn't send them itself.
+  - After a slider or cockpit board attaches, read its current state with `dp_read_snapshot()` so the PC starts in sync.
 - [ ] **Unused pins.** The design says to drive unused pins low at boot, which isn't done yet because it needs the final pin list from the schematic.
 
 ### Daughter board
@@ -51,7 +49,9 @@ These need the schematic or datasheet, and getting them wrong could stop a board
 
 The I2C drivers have only been compiled so far, and have not run on hardware or in a simulator.
 
-- [ ] **Test the full handshake** with a logic analyzer, including REGENERATE and re-enumeration.
+- [ ] **Test the full handshake** with a logic analyzer, including REGENERATE and re-enumeration. The enumerator has only run against fake boards, so this is the first time it talks to real daughter firmware.
+- [ ] **Check the motherboard ID on real boards.** Read it after first boot on a few boards to confirm they differ, because the simulator can't produce real ADC noise.
+- [ ] **Check real EEPROM writes.** Confirm that the database survives a power cycle, because the simulator finishes writes much faster than real hardware.
 - [ ] **Test the event retry.** Disconnect a board in the middle of a read and confirm that no event is lost.
 - [ ] **Test bus recovery.** Force a stuck bus and confirm the motherboard frees it.
 - [ ] **Check the bus load.** Polling four idle boards takes about 1.6 ms of each 5 ms cycle. Four full event queues take about 13 ms, so polling briefly falls behind. Confirm that's acceptable in practice.
