@@ -5,7 +5,7 @@ Implementation: [i2c_master.c](i2c_master.c.md)
 
 ## What it does
 
-Defines the public interface for using the I2C bus from the motherboard: complete read and write transactions, smaller steps for variable-length reads, and bus recovery. Call these functions from the main loop only, never from an interrupt.
+Defines the public interface for using the I2C bus from the motherboard: complete read and write transactions, smaller steps for variable-length reads, and bus recovery. Call these functions from the main loop only, never from an interrupt. The [system tick](../common/system_tick.h.md) must be running with interrupts enabled first: without it, the timeouts never expire and a stuck bus could hang the motherboard.
 
 ## Inputs and outputs
 

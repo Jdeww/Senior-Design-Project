@@ -2,14 +2,16 @@
 
 One page for each `.c` and `.h` file in `Drivers/`, in the same folder layout. Each page covers what the file does, its inputs and outputs, and how it works.
 
-**Status:** this code compiles and links for the PIC18LF25K50 with XC8 v4.00, but it has not been run on hardware or in a simulator. The link check used temporary stand-ins for the missing parts listed at the bottom of this page.
+**Status:** this code compiles and links for the PIC18LF25K50 with XC8 v4.00, but the I2C drivers have not been run on hardware or in a simulator. The link check used temporary stand-ins for the missing parts listed at the bottom of this page. The system tick's period has been measured in the simulator, as described in [its page](common/system_tick.c.md).
 
 ## Files
 
 | Doc | Runs on | Summary |
 |---|---|---|
 | [common/protocol.h](common/protocol.h.md) | Both boards | Addresses, message bytes, registers and timings that both boards must agree on |
-| [motherboard/board.h](motherboard/board.h.md) | Motherboard | Clock speed, I2C pins and the `g_ms` tick declaration |
+| [common/system_tick.h](common/system_tick.h.md) | Both boards | Public interface of the 1 ms time base |
+| [common/system_tick.c](common/system_tick.c.md) | Both boards | Runs Timer2 and counts milliseconds in `g_ms` |
+| [motherboard/board.h](motherboard/board.h.md) | Motherboard | Clock speed and I2C pins |
 | [motherboard/i2c_master.h](motherboard/i2c_master.h.md) | Motherboard | Public interface of the I2C master, including status codes |
 | [motherboard/i2c_master.c](motherboard/i2c_master.c.md) | Motherboard | Drives the bus using the MSSP hardware and recovers a stuck bus |
 | [motherboard/daughter_protocol.h](motherboard/daughter_protocol.h.md) | Motherboard | Public interface for talking to daughter boards |
@@ -33,7 +35,7 @@ i2c_master.c                                MSSP hardware (slave mode)
 MSSP hardware (master mode)  ====== I2C bus ========+
 ```
 
-`common/protocol.h` is included on both sides, so the two firmwares use the same values.
+`common/protocol.h` is included on both sides, so the two firmwares use the same values. `common/system_tick` runs on both boards too, and the motherboard's I2C timeouts depend on it.
 
 ## Terms
 
@@ -50,7 +52,7 @@ MSSP hardware (master mode)  ====== I2C bus ========+
 
 The firmware cannot run until these exist:
 
-- **Timer2 system tick:** defines and increments `g_ms` on the motherboard. The I2C timeouts depend on it.
+- **Oscillator setup:** runs each CPU at the speed in its `board.h`. Until then, the tick won't actually be 1 ms.
 - **Identity storage:** implements the three functions in `identity.h` on the daughter board.
 - **`main` for each board:** sets up clocks and interrupts and calls these drivers.
 - **Chain enumerator and daughter database:** run the handshake on the motherboard using `daughter_protocol`.

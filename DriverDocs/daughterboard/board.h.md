@@ -12,7 +12,7 @@ This file has no functions. It provides these names:
 
 | Name | Value | Purpose |
 |---|---|---|
-| `_XTAL_FREQ` | 16000000 | CPU clock in Hz |
+| `_XTAL_FREQ` | 16000000 | CPU clock in Hz. Selects the Timer2 settings in [system_tick.c](../common/system_tick.c.md). |
 | `I2C_SDA_ANS`, `I2C_SCL_ANS` | `ANSB0`, `ANSB1` | Analog/digital selection for the I2C pins |
 | `I2C_SDA_TRIS`, `I2C_SCL_TRIS` | `TRISB0`, `TRISB1` | Pin direction for the I2C pins |
 | `GATE_ANS` | `ANSB2` | Analog/digital selection for the gate pin |

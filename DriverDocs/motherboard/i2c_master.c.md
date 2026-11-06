@@ -13,7 +13,7 @@ The function-level inputs and outputs are listed in [i2c_master.h](i2c_master.h.
 
 | Direction | Item | Use |
 |---|---|---|
-| Input | `g_ms` | Time base for every timeout |
+| Input | `g_ms` from [system_tick](../common/system_tick.h.md) | Time base for every timeout |
 | Input | `PIR1.SSPIF` | Set by the hardware when an operation finishes |
 | Input | `PIR2.BCLIF` | Set by the hardware on a bus collision |
 | Input | `SSP1CON2.ACKSTAT` | Whether the daughter acknowledged the last byte |

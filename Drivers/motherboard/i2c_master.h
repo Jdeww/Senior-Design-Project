@@ -2,7 +2,8 @@
  * i2c_master.h - MSSP I2C master and bus recovery.
  *
  * Every wait has a timeout, so a bad pogo contact cannot freeze the main loop.
- * Call these from the main loop only, never from an interrupt.
+ * Call these from the main loop only, never from an interrupt. The system tick
+ * must be running with interrupts enabled first, because the timeouts rely on it.
  *
  * The whole-transaction functions clean up after themselves on failure:
  *   I2C_NACK                 sends STOP. The bus is healthy, nobody answered.

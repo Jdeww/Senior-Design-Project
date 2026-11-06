@@ -1,5 +1,5 @@
 /*
- * board.h - Motherboard clock, pins and system tick.
+ * board.h - Motherboard clock and pins.
  */
 #ifndef BOARD_H
 #define BOARD_H
@@ -20,9 +20,5 @@
 #define I2C_SCL_TRIS    TRISBbits.TRISB1
 #define I2C_SCL_LAT     LATBbits.LATB1
 #define I2C_SCL_PORT    PORTBbits.RB1
-
-/* Incremented every 1 ms by the Timer2 tick. Must be running, with interrupts
- * enabled, before any I2C call: the bus timeouts depend on it. */
-extern volatile uint16_t g_ms;
 
 #endif /* BOARD_H */
