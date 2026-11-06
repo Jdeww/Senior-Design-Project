@@ -2,7 +2,7 @@
 
 One page for each `.c` and `.h` file in `Drivers/`, in the same folder layout. Each page covers what the file does, its inputs and outputs, and how it works.
 
-**Status:** both firmwares build for the PIC18LF25K50 with XC8 v4.00. Nothing has run on hardware yet. In the simulator, the tick and main loops ran with the clock wait skipped, but the I2C drivers have not run at all. Each page's Testing section, where it has one, gives the details.
+**Status:** both firmwares build for the PIC18LF25K50 with XC8 v4.00. Nothing has run on hardware yet. In the simulator, the tick and main loops ran with the clock wait skipped, but the I2C drivers have not run at all. Each page's Testing section, where it has one, gives the details. Remaining work is in the [to-do list](TODO.md).
 
 ## Files
 
