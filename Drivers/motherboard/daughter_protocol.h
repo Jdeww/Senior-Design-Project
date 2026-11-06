@@ -5,13 +5,13 @@
  * Each call returns I2C_OK or an error from i2c_master.h. Two results need
  * particular handling by the caller:
  *   - I2C_NACK from dp_hello() is the normal end of the chain.
- *   - I2C_NACK from a position read counts toward NACK_LIMIT.
+ *   - Any error from dp_read_events() counts toward NACK_LIMIT.
  */
 #ifndef DAUGHTER_PROTOCOL_H
 #define DAUGHTER_PROTOCOL_H
 
 #include <stdint.h>
-#include "i2c_master.h"
+#include "motherboard/i2c_master.h"
 
 typedef struct {
     uint8_t  flag;      /* REPLY_FLAG_SEEN or REPLY_FLAG_NEW */

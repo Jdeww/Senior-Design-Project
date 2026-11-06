@@ -10,13 +10,13 @@
  *   the daughter's FIFO, so a slow PC does not lose them. Polling continues with
  *   room for none, because the poll is also how a dropped board is noticed.
  */
-#include "module_manager.h"
-#include "chain.h"
-#include "daughter_db.h"
-#include "daughter_protocol.h"
-#include "report_queue.h"
-#include "../common/protocol.h"
-#include "../common/system_tick.h"
+#include "motherboard/module_manager.h"
+#include "motherboard/chain.h"
+#include "motherboard/daughter_db.h"
+#include "motherboard/daughter_protocol.h"
+#include "motherboard/report_queue.h"
+#include "common/protocol.h"
+#include "common/system_tick.h"
 
 #define MAX_HELD_REPORTS    (CHAIN_MAX_POSITIONS * 8u)
 

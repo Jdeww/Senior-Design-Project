@@ -41,7 +41,7 @@ Functions that take a position return `I2C_BAD_DATA` without touching the bus if
 
 ## How it works
 
-These functions are meant to be called by the chain enumerator and main loop, which aren't written yet. One board's registration would run like this:
+These functions are called by the [chain enumerator](chain.c.md) and the [module manager](module_manager.c.md). `register_board()` in `chain.c` runs one board's registration like this:
 
 ```text
 dp_hello(mb_id)        I2C_NACK here means the end of the chain
@@ -59,6 +59,5 @@ dp_read_info(next_position, &info)   confirms the board moved to its new address
 |---|---|---|
 | `dp_hello()` | `I2C_NACK` | Treat as the normal end of the chain |
 | `dp_read_reply()` | `I2C_BAD_DATA` | Restart enumeration, since all the retries failed |
-| Reads from a position | `I2C_NACK` | Count toward `NACK_LIMIT` (2 in a row triggers re-enumeration) |
 | `dp_reset_chain()` | `I2C_NACK` | Expect this when no boards are connected |
-| `dp_read_events()` | Any error | Process the first `*count` events anyway, because the daughter has already removed them |
+| `dp_read_events()` | Any error | Process the first `*count` events anyway, because the daughter has already removed them. Then count the error toward `NACK_LIMIT` (2 failed polls in a row trigger re-enumeration). |

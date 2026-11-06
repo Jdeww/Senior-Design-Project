@@ -20,7 +20,7 @@ The function-level inputs and outputs are listed in [system_tick.h](system_tick.
 | Output | `IPR1.TMR2IP`, `PIE1.TMR2IE` | Sets the interrupt to low priority and enables it |
 | Output | `g_ms` | The millisecond count |
 
-Because `board.h` differs by board, each build's include path must contain that board's folder (`Drivers/motherboard` or `Drivers/daughterboard`).
+Because `board.h` differs by board, each build's include path must contain that board's folder (`Drivers/motherboard` or `Drivers/daughterboard`). This is why the file includes `board.h` with no folder in front of it.
 
 ## How it works
 

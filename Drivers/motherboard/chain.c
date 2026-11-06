@@ -5,12 +5,12 @@
  * gate stays open until it is accepted. Registering boards one by one therefore
  * gives their positions in physical order.
  */
-#include "board.h"
-#include "chain.h"
-#include "daughter_db.h"
-#include "daughter_protocol.h"
-#include "../common/protocol.h"
-#include "../common/system_tick.h"
+#include "motherboard/board.h"
+#include "motherboard/chain.h"
+#include "motherboard/daughter_db.h"
+#include "motherboard/daughter_protocol.h"
+#include "common/protocol.h"
+#include "common/system_tick.h"
 
 #define ENUMERATE_ATTEMPTS  3u  /* full passes before giving up until the next call */
 #define REGENERATE_LIMIT    5u  /* new IDs to ask one board for before giving up    */

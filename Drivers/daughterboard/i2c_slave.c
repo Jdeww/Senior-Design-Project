@@ -11,10 +11,10 @@
  *   i2c_slave_task(). If the motherboard reads the reply before it is ready, the
  *   clock is held low until it is. The master's timeout tolerates this.
  */
-#include "board.h"
-#include "i2c_slave.h"
-#include "identity.h"
-#include "../common/protocol.h"
+#include "daughterboard/board.h"
+#include "daughterboard/i2c_slave.h"
+#include "daughterboard/identity.h"
+#include "common/protocol.h"
 
 #define SSPCON1_SLAVE       0x36u   /* SSPEN = 1, CKP = 1, SSPM = 0110 (7-bit)  */
 #define SSPSTAT_100KHZ      0x80u   /* SMP = 1: slew control off below 400 kHz  */

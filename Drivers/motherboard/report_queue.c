@@ -3,8 +3,8 @@
  *
  * Reports are 8 bytes on USB, but none uses more than 6, so only 6 are stored.
  */
-#include "report_queue.h"
-#include "../common/protocol.h"
+#include "motherboard/report_queue.h"
+#include "common/protocol.h"
 
 #define STORED_LEN      6u
 

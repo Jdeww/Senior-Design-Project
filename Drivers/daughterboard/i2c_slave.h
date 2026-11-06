@@ -15,7 +15,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "../common/protocol.h"
+#include "common/protocol.h"
 
 #define I2C_SLAVE_SNAPSHOT_COUNT    SNAPSHOT_MAX
 

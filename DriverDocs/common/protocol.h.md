@@ -39,7 +39,7 @@ The chain uses three kinds of address:
 | `0x2F` (discovery) | The one board that has not been registered yet |
 | `0x31`..`0x34` | Registered boards, from `I2C_ADDR_FOR_POS(pos)` = `0x30 + pos` |
 
-Position 0 (`POSITION_MOTHERBOARD`) is reserved for the motherboard.
+Position 0 (`POSITION_MOTHERBOARD`) is the motherboard itself. It has no I2C address, and only appears in reports. The motherboard's own key switches will report as `[01][00][index][value]` once the key scanner is written.
 
 ### Message formats
 
@@ -55,6 +55,5 @@ The last four reply bytes are the bitwise inverse of the first four, which lets 
 
 ### Open items in the file
 
-- **Bus speed:** a comment records that the two summary documents disagree on 100 kHz and 400 kHz. The file uses 100 kHz.
 - **Cockpit switch count:** the number of switches per board is undecided.
 - **Encoder resolution:** `ENCODER_COUNTS_PER_DETENT` = 4 still needs checking against the actual part.

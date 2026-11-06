@@ -4,14 +4,16 @@
  * USB is not written yet, so nothing drains the report queue. Once it fills, boards
  * are still polled but their events wait on the daughter boards.
  *
+ * The scanner for the motherboard's own key switches is not written yet either.
+ *
  * Build with BRINGUP_TICK_PIN defined to toggle the test pin in board.h on every
  * tick. A scope should show a 500 Hz square wave, 1 ms high and 1 ms low.
  */
-#include "board.h"
-#include "i2c_master.h"
-#include "module_manager.h"
-#include "../common/clock.h"
-#include "../common/system_tick.h"
+#include "motherboard/board.h"
+#include "motherboard/i2c_master.h"
+#include "motherboard/module_manager.h"
+#include "common/clock.h"
+#include "common/system_tick.h"
 
 void __interrupt(low_priority) low_isr(void)
 {

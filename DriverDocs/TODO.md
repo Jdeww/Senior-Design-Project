@@ -34,6 +34,11 @@ These need the schematic or datasheet, and getting them wrong could stop a board
   - Drain the [report queue](motherboard/report_queue.h.md), one report per host poll. Until this exists, the queue stays full after 40 reports.
   - Handle the PC commands: `0x10` (list modules) needs a way to replay the chain reset, attach reports, states and chain complete, and `0x11` returns the firmware version.
   - Check USB timing against the main loop's blocking work: up to about 24 ms per new board for EEPROM writes, and up to about 13 ms for a poll pass with four full event queues.
+- [ ] **Key scanner.** The motherboard has key switches of its own, with no other input types. Scan and debounce them (`KEY_DEBOUNCE_SCANS`, 5 matching 1 ms scans), detect edges, and report each change as `[01][00][index][value]`.
+  - Get the key count and pins from the schematic.
+  - Decide whether position 0 gets an attach report, and how it's handled in the `0x10` replay, since the PC clears its layout on a chain reset.
+  - Don't lose key changes when the report queue is full. `restart_chain()` can also empty the queue, and its build-time room check only counts daughter boards.
+  - Keep scanning on time during the main loop's blocking work (see the USB driver's timing check above).
 - [ ] **Unused pins.** The design says to drive unused pins low at boot, which isn't done yet because it needs the final pin list from the schematic.
 
 ### Daughter board
@@ -60,7 +65,8 @@ The I2C drivers have only been compiled so far, and have not run on hardware or 
 
 ## 6. Open design questions
 
-- [ ] **I2C bus speed.** The two summary documents disagree on 100 kHz and 400 kHz. The code uses 100 kHz for now, and could try 400 kHz once the bus is proven.
+- [x] **I2C bus speed.** Decided: 100 kHz.
+- [x] **Motherboard inputs.** Decided: the motherboard has inputs of its own, and they're regular key switches only.
 - [ ] **Cockpit switch count.** How many switches are on each board, and how many are 3-position? The driver provides 8 snapshot registers.
 - [ ] **Encoder resolution.** The code assumes 4 counts per detent. Check this against the actual part.
 
@@ -68,10 +74,12 @@ The I2C drivers have only been compiled so far, and have not run on hardware or 
 
 - [ ] **Firmware Driver Summary, key 5 example.** It shows the daughter replying `01 05 01`. The bus now carries `01 05 01 FF`, because the read ends on one extra byte.
 - [ ] **Firmware Driver Summary, chain length.** It assumes up to 8 positions. The code uses 4.
+- [ ] **Firmware Driver Summary, bus speed.** It says 400 kHz. The code uses 100 kHz, which matches the Driver Summary.
+- [ ] **Firmware Driver Summary, motherboard inputs.** It says the key scanner, debounce and edge detection were removed from the motherboard, and lists its inputs as an open question. The motherboard keeps them for its own key switches, which matches the Driver Summary.
 - [ ] **Keystroke diagram, bus recovery.** It shows recovery on "NACK or timeout". The code recovers on a timeout or collision, not on a NACK, because HELLO gets a NACK at the end of the chain every 100 ms.
 - [ ] **`DriverDocs` pages.** These don't update automatically, so edit them whenever the drivers change.
 
 ## 8. Development setup
 
 - [ ] **Set up the MPLAB projects.** Use one project per board, with the source files and include paths listed in the [README](README.md).
-- [ ] **Fix the VS Code include paths (optional).** The `cannot open source file "stdint.h"` errors come from IntelliSense not knowing where the XC8 headers are. They don't affect the build.
+- [ ] **Fix the VS Code include paths (optional).** The `cannot open source file` errors come from IntelliSense not knowing where the XC8 headers and the `Drivers` folder are. They don't affect the build.

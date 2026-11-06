@@ -4,9 +4,9 @@
  * Nothing is saved, so the board forgets every motherboard at power-off and always
  * answers HELLO as new. Delete this file when the real EEPROM version is written.
  */
-#include "identity.h"
-#include "../common/protocol.h"
-#include "../common/system_tick.h"
+#include "daughterboard/identity.h"
+#include "common/protocol.h"
+#include "common/system_tick.h"
 
 uint16_t identity_new_id(void)
 {

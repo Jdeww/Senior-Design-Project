@@ -5,11 +5,12 @@
  *   tick rate = Fosc / 4 / prescale / (PR2 + 1) / postscale
  *
  * board.h supplies _XTAL_FREQ, so each board's include path must contain its own
- * board folder.
+ * board folder. This file builds for both boards, so board.h is the one include
+ * written without a folder.
  */
 #include "board.h"
-#include "system_tick.h"
-#include "protocol.h"
+#include "common/system_tick.h"
+#include "common/protocol.h"
 
 #define TICK_PR2                249u    /* 250 counts per period */
 

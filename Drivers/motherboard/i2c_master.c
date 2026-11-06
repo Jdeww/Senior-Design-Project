@@ -1,10 +1,10 @@
 /*
  * i2c_master.c - MSSP I2C master and bus recovery. See i2c_master.h.
  */
-#include "board.h"
-#include "i2c_master.h"
-#include "../common/protocol.h"
-#include "../common/system_tick.h"
+#include "motherboard/board.h"
+#include "motherboard/i2c_master.h"
+#include "common/protocol.h"
+#include "common/system_tick.h"
 
 /* Fscl = Fosc / (4 * (SSP1ADD + 1)) */
 #define I2C_BRG             ((uint8_t)((_XTAL_FREQ / (4UL * I2C_BUS_HZ)) - 1UL))

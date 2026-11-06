@@ -41,7 +41,7 @@ One page for each `.c` and `.h` file in `Drivers/`, in the same folder layout. E
 ```text
 MOTHERBOARD                                 DAUGHTER BOARD
 
-main.c                                      main.c, then input drivers (not written)
+main.c, key scanner (not written)           main.c, then input drivers (not written)
         |                                           |
 module_manager.c  -->  report_queue.c               |
         |              (USB, not written)           |
@@ -56,12 +56,14 @@ MSSP hardware (master mode)  ====== I2C bus ========+
 
 `common/protocol.h` is included on both sides, so the two firmwares use the same values. `common/system_tick` runs on both boards too, and the motherboard's I2C timeouts depend on it.
 
+The motherboard has key switches of its own, with no other input types. Its key scanner will put their events straight into the report queue at position 0, without using the I2C bus.
+
 ## Terms
 
 | Term | Meaning |
 |---|---|
 | MSSP | The PIC's built-in serial hardware, used here in I2C mode |
-| Position | A board's place in the chain, 1 to 4, which sets its address (`0x30 + position`) |
+| Position | A daughter board's place in the chain, 1 to 4, which sets its address (`0x30 + position`). Position 0 means the motherboard, and only appears in reports. |
 | Gate closed | The switch conducts, so the next board is connected to the bus |
 | Gate open | The switch is off, so the next board cannot hear the bus |
 | Clock stretching | A daughter holds SCL low to make the motherboard wait |
@@ -73,8 +75,10 @@ Each firmware is its own build, with its own board folder on the include path.
 
 | Firmware | Source files | Include paths |
 |---|---|---|
-| Motherboard | `motherboard/main.c`, `module_manager.c`, `report_queue.c`, `chain.c`, `daughter_db.c`, `daughter_protocol.c`, `i2c_master.c`, `common/clock.c`, `common/eeprom.c`, `common/system_tick.c` | `Drivers/motherboard`, `Drivers/common` |
-| Daughter | `daughterboard/main.c`, `i2c_slave.c`, `identity_stub.c`, `common/clock.c`, `common/system_tick.c` | `Drivers/daughterboard`, `Drivers/common` |
+| Motherboard | `motherboard/main.c`, `module_manager.c`, `report_queue.c`, `chain.c`, `daughter_db.c`, `daughter_protocol.c`, `i2c_master.c`, `common/clock.c`, `common/eeprom.c`, `common/system_tick.c` | `Drivers`, `Drivers/motherboard` |
+| Daughter | `daughterboard/main.c`, `i2c_slave.c`, `identity_stub.c`, `common/clock.c`, `common/system_tick.c` | `Drivers`, `Drivers/daughterboard` |
+
+Includes are written from the `Drivers` folder, such as `"common/protocol.h"` or `"motherboard/chain.h"`. The one exception is `"board.h"` in the `common` source files. They build for both boards, so each build's board folder decides which `board.h` they get.
 
 To build the scope test, also define `BRINGUP_TICK_PIN`.
 
@@ -88,5 +92,6 @@ To build the scope test, also define `BRINGUP_TICK_PIN`.
 ## Not written yet
 
 - **USB driver:** sends reports to the PC, and handles its commands.
+- **Motherboard key scanner:** reads and debounces the motherboard's own key switches.
 - **Real identity storage:** replaces `identity_stub.c` with EEPROM storage and real random IDs.
 - **Input detection and input drivers:** read the ID resistor and the keys, encoder, slider or switches on each daughter.

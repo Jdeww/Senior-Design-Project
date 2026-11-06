@@ -19,9 +19,7 @@
 /* ------------------------------------------------------------------------ */
 /* I2C bus                                                                  */
 /* ------------------------------------------------------------------------ */
-/* OPEN QUESTION: the Driver Summary says 100 kHz, the Firmware Summary says
- * 400 kHz. Start at 100 kHz for bring-up (more forgiving of pogo pins and
- * long chains), then try 400 kHz once the bus is proven. */
+/* 100 kHz is more forgiving of pogo pins and long chains. */
 #define I2C_BUS_HZ                  100000UL
 
 #define I2C_ADDR_GENERAL_CALL       0x00u   /* RESET_CHAIN is sent here      */
@@ -29,7 +27,7 @@
 #define I2C_ADDR_POS_BASE           0x30u   /* registered: 0x30 + position   */
 
 #define CHAIN_MAX_POSITIONS         4u      /* positions 1..4 = 0x31..0x34   */
-#define POSITION_MOTHERBOARD        0u      /* reserved for the main board   */
+#define POSITION_MOTHERBOARD        0u      /* its own keys, in reports only */
 
 #define I2C_ADDR_FOR_POS(pos)       ((uint8_t)(I2C_ADDR_POS_BASE + (pos)))
 
@@ -142,6 +140,7 @@
 /* Timing (ms unless noted)                                                 */
 /* ------------------------------------------------------------------------ */
 #define TICK_MS                     1u      /* Timer2 system tick            */
+#define KEY_DEBOUNCE_SCANS          5u      /* 5 matching 1 ms scans         */
 
 /* Motherboard */
 #define POLL_INTERVAL_MS            5u      /* read events from each position*/
@@ -153,7 +152,6 @@
 #define BUS_RECOVERY_CLOCKS         9u
 
 /* Daughter */
-#define KEY_DEBOUNCE_SCANS          5u      /* 5 matching 1 ms scans         */
 #define COCKPIT_DEBOUNCE_MS         20u
 #define SLIDER_SAMPLE_MS            2u
 #define SLIDER_HYSTERESIS           2u      /* +/- counts                    */

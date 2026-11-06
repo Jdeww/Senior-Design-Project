@@ -20,7 +20,7 @@ The function's result is described in [clock.h](clock.h.md). This file also inte
 | Output | `OSCCON`, `OSCTUNE` | Select 16 MHz and the 3x PLL |
 | Output | `ACTCON` (motherboard) | Turns on Active Clock Tuning from USB frames |
 
-Because `board.h` differs by board, each build's include path must contain that board's folder.
+Because `board.h` differs by board, each build's include path must contain that board's folder. This is why the file includes `board.h` with no folder in front of it.
 
 ## How it works
 

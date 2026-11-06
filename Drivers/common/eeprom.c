@@ -1,9 +1,12 @@
 /*
  * eeprom.c - See eeprom.h.
+ *
+ * This file builds for both boards, so board.h is the one include written without
+ * a folder. Each board's include path must contain its own board folder.
  */
 #include "board.h"
-#include "eeprom.h"
-#include "system_tick.h"
+#include "common/eeprom.h"
+#include "common/system_tick.h"
 
 #define EEPROM_WRITE_TIMEOUT_MS     10u     /* a write normally takes about 4 ms */
 

@@ -8,6 +8,8 @@ Starts the motherboard and holds its interrupt handler and main loop. The [modul
 
 **USB isn't written yet, so nothing drains the report queue.** After 40 reports it stays full. Boards are still polled and dropped boards are still noticed, but events wait on the daughter boards.
 
+**The scanner for the motherboard's own key switches isn't written yet either.** See the [to-do list](../TODO.md).
+
 ## Inputs and outputs
 
 | Direction | Item | Use |
@@ -39,7 +41,7 @@ Starts the motherboard and holds its interrupt handler and main loop. The [modul
 
 ### Main loop
 
-Calls `module_manager_task()` on every pass. USB servicing will be added here.
+Calls `module_manager_task()` on every pass. USB servicing and the key scanner will be added here.
 
 ### Scope test
 

@@ -7,11 +7,11 @@
  * Build with BRINGUP_TICK_PIN defined to toggle the test pin in board.h on every
  * tick. A scope should show a 500 Hz square wave, 1 ms high and 1 ms low.
  */
-#include "board.h"
-#include "i2c_slave.h"
-#include "../common/clock.h"
-#include "../common/protocol.h"
-#include "../common/system_tick.h"
+#include "daughterboard/board.h"
+#include "daughterboard/i2c_slave.h"
+#include "common/clock.h"
+#include "common/protocol.h"
+#include "common/system_tick.h"
 
 void __interrupt(high_priority) high_isr(void)
 {

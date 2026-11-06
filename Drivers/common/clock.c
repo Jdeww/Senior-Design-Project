@@ -2,10 +2,11 @@
  * clock.c - See clock.h.
  *
  * board.h supplies _XTAL_FREQ, so each board's include path must contain its own
- * board folder.
+ * board folder. This file builds for both boards, so board.h is the one include
+ * written without a folder.
  */
 #include "board.h"
-#include "clock.h"
+#include "common/clock.h"
 
 /* Settings shared by both boards. */
 #pragma config FOSC = INTOSCIO      /* internal oscillator; RA6 and RA7 stay I/O */

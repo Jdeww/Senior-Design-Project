@@ -12,11 +12,11 @@
  * power cut part way through leaves the entry outside the counted table, so it
  * is simply ignored.
  */
-#include "board.h"
-#include "daughter_db.h"
-#include "../common/eeprom.h"
-#include "../common/protocol.h"
-#include "../common/system_tick.h"
+#include "motherboard/board.h"
+#include "motherboard/daughter_db.h"
+#include "common/eeprom.h"
+#include "common/protocol.h"
+#include "common/system_tick.h"
 
 #define ADDR_MAGIC          0u
 #define ADDR_ID_HI          1u

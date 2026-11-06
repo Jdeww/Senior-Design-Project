@@ -1,8 +1,8 @@
 /*
  * daughter_protocol.c - See daughter_protocol.h.
  */
-#include "daughter_protocol.h"
-#include "../common/protocol.h"
+#include "motherboard/daughter_protocol.h"
+#include "common/protocol.h"
 
 #define ID_HI(id)   ((uint8_t)((id) >> 8))
 #define ID_LO(id)   ((uint8_t)(id))
