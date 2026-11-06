@@ -31,7 +31,9 @@ typedef struct {
     uint8_t value;
 } dp_event_t;
 
-/* Handshake, all sent to the one unregistered board on the bus. */
+/* Handshake. dp_reset_chain() is a general call that every daughter hears. The
+ * others use the discovery address, which only the one unregistered board on
+ * the bus answers. */
 i2c_status_t dp_reset_chain(void);
 i2c_status_t dp_hello(uint16_t mb_id);
 
