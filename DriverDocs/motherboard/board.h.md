@@ -17,9 +17,10 @@ This file has no functions. It provides these names:
 | `I2C_SDA_TRIS`, `I2C_SCL_TRIS` | `TRISB0`, `TRISB1` | Pin direction: 1 = input (released), 0 = output |
 | `I2C_SDA_LAT`, `I2C_SCL_LAT` | `LATB0`, `LATB1` | The level a pin drives when it is an output |
 | `I2C_SDA_PORT`, `I2C_SCL_PORT` | `RB0`, `RB1` | The level actually on the pin |
+| `BRINGUP_ANS`, `BRINGUP_TRIS`, `BRINGUP_LAT` | `ANSA1`, `TRISA1`, `LATA1` | Scope test pin, used only in builds with `BRINGUP_TICK_PIN` defined. **RA1 is a placeholder; check the schematic first.** |
 
 ## How it works
 
-- **Clock:** 48 MHz comes from the 16 MHz internal oscillator with the 3x PLL. This file only states the frequency; it doesn't configure the oscillator. That is left to startup code, which isn't written yet.
+- **Clock:** 48 MHz comes from the 16 MHz internal oscillator with the 3x PLL. This file only states the frequency; [clock.c](../common/clock.c.md) configures the oscillator.
 - **Timer settings:** [system_tick.c](../common/system_tick.c.md) reads `_XTAL_FREQ` from this file to choose its Timer2 settings.
 - **Pins:** SDA is RB0 and SCL is RB1, which are the chip's fixed MSSP pins.

@@ -1,5 +1,6 @@
 /*
- * identity.h - What the I2C slave needs from identity storage (not written yet).
+ * identity.h - What the I2C slave needs from identity storage. The real EEPROM
+ * version is not written yet; identity_stub.c stands in for it during bring-up.
  *
  * The slave calls these from i2c_slave_task(), in the main loop. The motherboard
  * is waiting on the clock during the lookup and new-ID calls, so they must finish

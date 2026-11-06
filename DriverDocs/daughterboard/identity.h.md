@@ -4,7 +4,7 @@ Source: `Drivers/daughterboard/identity.h`
 
 ## What it does
 
-Lists the three functions the I2C slave needs from the board's identity storage. It only declares them: **there is no `identity.c` yet, so the daughter firmware won't link until they are written.**
+Lists the three functions the I2C slave needs from the board's identity storage. It only declares them. **The real EEPROM version isn't written yet**, so [identity_stub.c](identity_stub.c.md) stands in for it during bring-up.
 
 Identity storage remembers which motherboards this board has joined and which ID it uses on each one, so it can answer HELLO as "seen" with its old ID or "new" with a fresh one.
 

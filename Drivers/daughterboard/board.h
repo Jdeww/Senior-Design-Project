@@ -23,4 +23,11 @@
 #define GATE_TRIS       TRISBbits.TRISB2
 #define GATE_LAT        LATBbits.LATB2
 
+/* Scope test pin, driven only in builds with BRINGUP_TICK_PIN defined.
+ * PLACEHOLDER PIN: RA1 is not from the design documents. Check the schematic
+ * before using it, because the test drives this pin as an output. */
+#define BRINGUP_ANS     ANSELAbits.ANSA1
+#define BRINGUP_TRIS    TRISAbits.TRISA1
+#define BRINGUP_LAT     LATAbits.LATA1
+
 #endif /* BOARD_H */

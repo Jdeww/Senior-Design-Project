@@ -65,4 +65,4 @@ The period was measured in the MPLAB X simulator (v6.35) with a test program tha
 
 The 3,999 is consistent with normal interrupt timing, since the interrupt can't start until the current instruction finishes. On both builds, `g_ms` read 3 when stopped at the fourth tick, just before that tick added 1, so the count advances once per tick.
 
-This confirms the timer settings in instruction cycles. It doesn't confirm real-world time: 1 ms also requires the CPU to actually run at `_XTAL_FREQ`, and the oscillator setup isn't written yet.
+This confirms the timer settings in instruction cycles. It doesn't confirm real-world time: 1 ms also requires the CPU to actually run at `_XTAL_FREQ`, which [clock.c](clock.c.md) sets up but only real hardware can confirm. See the scope test in the [motherboard main.c page](../motherboard/main.c.md).

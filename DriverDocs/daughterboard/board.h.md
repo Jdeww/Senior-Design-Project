@@ -18,10 +18,11 @@ This file has no functions. It provides these names:
 | `GATE_ANS` | `ANSB2` | Analog/digital selection for the gate pin |
 | `GATE_TRIS` | `TRISB2` | Gate pin direction |
 | `GATE_LAT` | `LATB2` | Gate pin level: 1 = closed, 0 = open |
+| `BRINGUP_ANS`, `BRINGUP_TRIS`, `BRINGUP_LAT` | `ANSA1`, `TRISA1`, `LATA1` | Scope test pin, used only in builds with `BRINGUP_TICK_PIN` defined. **RA1 is a placeholder; check the schematic first.** |
 
 ## How it works
 
-- **Clock:** 16 MHz from the internal oscillator with no PLL, since daughters don't use USB. This file only states the frequency; startup code, which isn't written yet, must configure the oscillator.
+- **Clock:** 16 MHz from the internal oscillator with no PLL, since daughters don't use USB. This file only states the frequency; [clock.c](../common/clock.c.md) configures the oscillator.
 - **I2C pins:** SDA is RB0 and SCL is RB1, which are the chip's fixed MSSP pins. There are no latch or port names here because slave mode doesn't control the pins directly.
 - **Chain gate:** the pin drives the enable of the switch on the downstream SDA and SCL lines. High closes the gate and connects the next board; low opens it and isolates that board.
 
