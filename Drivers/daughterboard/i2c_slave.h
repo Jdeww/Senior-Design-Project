@@ -15,8 +15,9 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "../common/protocol.h"
 
-#define I2C_SLAVE_SNAPSHOT_COUNT    8u  /* registers 0x20..0x27 */
+#define I2C_SLAVE_SNAPSHOT_COUNT    SNAPSHOT_MAX
 
 void i2c_slave_init(uint8_t input_type, uint8_t input_count);
 void i2c_slave_isr(void);

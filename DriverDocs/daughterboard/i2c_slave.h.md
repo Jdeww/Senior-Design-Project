@@ -17,7 +17,7 @@ Defines how the rest of the daughter firmware uses the I2C slave driver: startin
 | `i2c_slave_push_event(index, value)` | Which input; its new value | `true` if queued, `false` if the queue is full | Main loop only |
 | `i2c_slave_set_snapshot(input, value)` | Input number; its current value | None. Inputs out of range are ignored. | Main loop only |
 
-`I2C_SLAVE_SNAPSHOT_COUNT` is 8, which provides snapshot registers 0x20 to 0x27.
+`I2C_SLAVE_SNAPSHOT_COUNT` equals `SNAPSHOT_MAX` from `protocol.h`, which is 8, providing snapshot registers 0x20 to 0x27.
 
 ## How it works
 

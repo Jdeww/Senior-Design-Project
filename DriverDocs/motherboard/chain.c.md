@@ -59,10 +59,9 @@ If any step fails, the table is emptied and the whole pass is tried again, up to
 
 Calls `register_board()` for the next position, with no reset. When the chain is full it returns without sending anything, so a fifth board stays unregistered and is never accepted.
 
-### What this doesn't do yet
+### What this leaves to the module manager
 
-- It doesn't send attach, chain reset or chain complete reports, because the USB driver isn't written. The table is what the USB driver will read.
-- It doesn't read slider and cockpit switch positions after registering, because those are only needed for reports to the PC.
+This file only keeps the table. The [module manager](module_manager.c.md) reads it to send attach, chain reset and chain complete reports, and to read slider and cockpit switch positions after a board registers.
 
 ## Testing
 

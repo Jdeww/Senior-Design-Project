@@ -18,13 +18,14 @@ There are no runtime inputs or outputs. The file's only input is its own include
 | I2C bus | `I2C_BUS_HZ` = 100 kHz; addresses 0x00, 0x2F and 0x30 + position; `CHAIN_MAX_POSITIONS` = 4 | Yes |
 | Handshake messages | `MSG_RESET_CHAIN` 0xA4, `MSG_HELLO` 0xB0, `MSG_ACCEPT` 0xA1, `MSG_REGENERATE` 0xA2, and their lengths | Yes |
 | HELLO reply | 8 bytes; flag values and byte positions | Yes |
-| Daughter registers | `REG_INPUT_TYPE` 0x00 through `REG_POSITION` 0x06, `REG_SNAPSHOT_BASE` 0x20, `EVENT_FIFO_DEPTH` 16 | Yes |
-| Timing | `TICK_MS`, `I2C_TIMEOUT_MS`, `REPLY_RETRIES`, `BUS_RECOVERY_CLOCKS` | Yes |
-| Timing | `POLL_INTERVAL_MS`, `HELLO_INTERVAL_MS`, `GATE_SETTLE_MS`, `NACK_LIMIT`, debounce and slider values | Not yet |
+| Daughter registers | `REG_INPUT_TYPE` 0x00 through `REG_POSITION` 0x06, `REG_SNAPSHOT_BASE` 0x20, `SNAPSHOT_MAX` 8, `EVENT_FIFO_DEPTH` 16 | Yes |
+| Timing | `TICK_MS`, `I2C_TIMEOUT_MS`, `REPLY_RETRIES`, `BUS_RECOVERY_CLOCKS`, `POLL_INTERVAL_MS`, `HELLO_INTERVAL_MS`, `GATE_SETTLE_MS`, `NACK_LIMIT` | Yes |
+| Timing | Debounce and slider values | Not yet |
 | Input types | `INPUT_TYPE_*`, `INPUT_COUNT_*`, `ADC_WIN_*` | Not yet |
-| USB reports | `RPT_*`, `CMD_*`, `USB_REPORT_LEN`, `USB_HID_USAGE_PAGE` | Not yet |
-| EEPROM | `EEPROM_MAGIC`, `EEPROM_ENTRY_LEN`, `EEPROM_MAX_ENTRIES` | Not yet |
-| ID limits | `ID_INVALID_LOW`, `ID_INVALID_HIGH` | Not yet |
+| USB reports | `RPT_*`, `USB_REPORT_LEN` | Yes |
+| USB reports | `CMD_*`, `USB_HID_USAGE_PAGE` | Not yet |
+| EEPROM | `EEPROM_MAGIC`, `EEPROM_ENTRY_LEN`, `EEPROM_MAX_ENTRIES` | Yes |
+| ID limits | `ID_INVALID_LOW`, `ID_INVALID_HIGH` | Yes |
 
 ## How it works
 

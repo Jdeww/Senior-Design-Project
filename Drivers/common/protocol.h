@@ -76,6 +76,7 @@
 #define REG_EVENTS                  0x05u   /* [count] then [index][value]...*/
 #define REG_POSITION                0x06u
 #define REG_SNAPSHOT_BASE           0x20u   /* 0x20 + n = current value of n */
+#define SNAPSHOT_MAX                8u      /* registers 0x20..0x27          */
 
 #define EVENT_FIFO_DEPTH            16u     /* entries of [index][value]     */
 

@@ -28,12 +28,12 @@ These need the schematic or datasheet, and getting them wrong could stop a board
 
 - [x] **Chain enumerator.** Written and tested against fake boards. See [chain.c](motherboard/chain.c.md).
 - [x] **Daughter database.** Written and tested in the simulator. See [daughter_db.c](motherboard/daughter_db.c.md).
-- [ ] **Polling schedule.** Polls each position every 5 ms from `main.c`.
-  - When `dp_read_events()` returns an error, still process the first `*count` events before handling the error. The daughter has already removed them and won't send them again.
-- [ ] **Module manager.** Counts NACKs toward `NACK_LIMIT`, sends key releases and detach reports for a board that drops out, then re-enumerates.
-- [ ] **USB driver.** The HID reports, report queue and event aggregator, connected to `main.c`.
-  - Send the chain reset, attach and chain complete reports from the table in `chain.c`, which doesn't send them itself.
-  - After a slider or cockpit board attaches, read its current state with `dp_read_snapshot()` so the PC starts in sync.
+- [x] **Polling schedule.** Written and tested against fake boards. See [module_manager.c](motherboard/module_manager.c.md).
+- [x] **Module manager and event aggregator.** Written and tested against fake boards, in the same file.
+- [ ] **USB driver.** The USB core and HID class from Microchip's MLA stack, connected to `main.c`.
+  - Drain the [report queue](motherboard/report_queue.h.md), one report per host poll. Until this exists, the queue stays full after 40 reports.
+  - Handle the PC commands: `0x10` (list modules) needs a way to replay the chain reset, attach reports, states and chain complete, and `0x11` returns the firmware version.
+  - Check USB timing against the main loop's blocking work: up to about 24 ms per new board for EEPROM writes, and up to about 13 ms for a poll pass with four full event queues.
 - [ ] **Unused pins.** The design says to drive unused pins low at boot, which isn't done yet because it needs the final pin list from the schematic.
 
 ### Daughter board
@@ -52,6 +52,8 @@ The I2C drivers have only been compiled so far, and have not run on hardware or 
 - [ ] **Test the full handshake** with a logic analyzer, including REGENERATE and re-enumeration. The enumerator has only run against fake boards, so this is the first time it talks to real daughter firmware.
 - [ ] **Check the motherboard ID on real boards.** Read it after first boot on a few boards to confirm they differ, because the simulator can't produce real ADC noise.
 - [ ] **Check real EEPROM writes.** Confirm that the database survives a power cycle, because the simulator finishes writes much faster than real hardware.
+- [ ] **Test hot-swap on real boards.** Unplug the last board and a middle board with keys held. Confirm that the chain rebuilds, and that each board behind a removed one comes back once it's reconnected.
+- [ ] **Decide how a key held during a restart should behave.** The PC gets a release even if the key is still physically down, and no new press until it's released and pressed again.
 - [ ] **Test the event retry.** Disconnect a board in the middle of a read and confirm that no event is lost.
 - [ ] **Test bus recovery.** Force a stuck bus and confirm the motherboard frees it.
 - [ ] **Check the bus load.** Polling four idle boards takes about 1.6 ms of each 5 ms cycle. Four full event queues take about 13 ms, so polling briefly falls behind. Confirm that's acceptable in practice.

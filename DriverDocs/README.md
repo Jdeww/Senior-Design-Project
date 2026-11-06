@@ -2,7 +2,7 @@
 
 One page for each `.c` and `.h` file in `Drivers/`, in the same folder layout. Each page covers what the file does, its inputs and outputs, and how it works.
 
-**Status:** both firmwares build for the PIC18LF25K50 with XC8 v4.00. Nothing has run on hardware yet. In the simulator, the tick ran with the clock wait skipped, and the enumerator and database ran against fake boards, but the I2C drivers have not run at all. Each page's Testing section, where it has one, gives the details. Remaining work is in the [to-do list](TODO.md).
+**Status:** both firmwares build for the PIC18LF25K50 with XC8 v4.00. Nothing has run on hardware yet. In the simulator, the tick ran with the clock wait skipped, and the enumerator, database and module manager ran against fake boards, but the I2C drivers have not run at all. Each page's Testing section, where it has one, gives the details. Remaining work is in the [to-do list](TODO.md).
 
 ## Files
 
@@ -17,6 +17,10 @@ One page for each `.c` and `.h` file in `Drivers/`, in the same folder layout. E
 | [common/system_tick.c](common/system_tick.c.md) | Both boards | Runs Timer2 and counts milliseconds in `g_ms` |
 | [motherboard/board.h](motherboard/board.h.md) | Motherboard | Clock speed and I2C pins |
 | [motherboard/main.c](motherboard/main.c.md) | Motherboard | Startup, interrupt handler and main loop |
+| [motherboard/module_manager.h](motherboard/module_manager.h.md) | Motherboard | Public interface of the module manager |
+| [motherboard/module_manager.c](motherboard/module_manager.c.md) | Motherboard | Polls boards, builds reports, and handles boards joining and dropping out |
+| [motherboard/report_queue.h](motherboard/report_queue.h.md) | Motherboard | Public interface of the queue of reports for the PC |
+| [motherboard/report_queue.c](motherboard/report_queue.c.md) | Motherboard | Stores reports in order and builds their bytes |
 | [motherboard/chain.h](motherboard/chain.h.md) | Motherboard | Public interface of the chain enumerator |
 | [motherboard/chain.c](motherboard/chain.c.md) | Motherboard | Registers boards in order and decides ACCEPT or REGENERATE |
 | [motherboard/daughter_db.h](motherboard/daughter_db.h.md) | Motherboard | Public interface of the daughter database |
@@ -39,6 +43,8 @@ MOTHERBOARD                                 DAUGHTER BOARD
 
 main.c                                      main.c, then input drivers (not written)
         |                                           |
+module_manager.c  -->  report_queue.c               |
+        |              (USB, not written)           |
 chain.c  <-->  daughter_db.c                        |
         |                                           |
 daughter_protocol.c                         i2c_slave.c  <-->  identity_stub.c (temporary)
@@ -67,7 +73,7 @@ Each firmware is its own build, with its own board folder on the include path.
 
 | Firmware | Source files | Include paths |
 |---|---|---|
-| Motherboard | `motherboard/main.c`, `chain.c`, `daughter_db.c`, `daughter_protocol.c`, `i2c_master.c`, `common/clock.c`, `common/eeprom.c`, `common/system_tick.c` | `Drivers/motherboard`, `Drivers/common` |
+| Motherboard | `motherboard/main.c`, `module_manager.c`, `report_queue.c`, `chain.c`, `daughter_db.c`, `daughter_protocol.c`, `i2c_master.c`, `common/clock.c`, `common/eeprom.c`, `common/system_tick.c` | `Drivers/motherboard`, `Drivers/common` |
 | Daughter | `daughterboard/main.c`, `i2c_slave.c`, `identity_stub.c`, `common/clock.c`, `common/system_tick.c` | `Drivers/daughterboard`, `Drivers/common` |
 
 To build the scope test, also define `BRINGUP_TICK_PIN`.
@@ -81,7 +87,6 @@ To build the scope test, also define `BRINGUP_TICK_PIN`.
 
 ## Not written yet
 
-- **Polling and module manager:** collect events from each board and handle boards that drop out.
-- **USB driver:** sends reports to the PC.
+- **USB driver:** sends reports to the PC, and handles its commands.
 - **Real identity storage:** replaces `identity_stub.c` with EEPROM storage and real random IDs.
 - **Input detection and input drivers:** read the ID resistor and the keys, encoder, slider or switches on each daughter.

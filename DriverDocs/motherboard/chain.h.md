@@ -20,7 +20,7 @@ Defines the chain enumerator's interface: registering daughter boards in physica
 
 ## How it works
 
-Call these from the main loop only, after `db_init()`:
+Call these from the main loop only, after `db_init()`. The [module manager](module_manager.c.md) makes these calls in the real firmware, in this pattern:
 
 ```c
 (void)db_init();
