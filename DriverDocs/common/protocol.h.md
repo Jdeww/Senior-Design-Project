@@ -22,8 +22,8 @@ There are no runtime inputs or outputs. The file's only input is its own include
 | Timing | `TICK_MS`, `I2C_TIMEOUT_MS`, `REPLY_RETRIES`, `BUS_RECOVERY_CLOCKS`, `POLL_INTERVAL_MS`, `HELLO_INTERVAL_MS`, `GATE_SETTLE_MS`, `NACK_LIMIT` | Yes |
 | Timing | Debounce and slider values | Not yet |
 | Input types | `INPUT_TYPE_*`, `INPUT_COUNT_*`, `ADC_WIN_*` | Not yet |
-| USB reports | `RPT_*`, `USB_REPORT_LEN` | Yes |
-| USB reports | `CMD_*`, `USB_HID_USAGE_PAGE` | Not yet |
+| USB reports | `RPT_*` (0x01 to 0x06), `USB_REPORT_LEN`, `CMD_*` | Yes |
+| USB reports | `USB_HID_USAGE_PAGE` | Not directly; the report descriptor in `usb_descriptors.c` writes 0xFF00 out |
 | EEPROM | `EEPROM_MAGIC`, `EEPROM_ENTRY_LEN`, `EEPROM_MAX_ENTRIES` | Yes |
 | ID limits | `ID_INVALID_LOW`, `ID_INVALID_HIGH` | Yes |
 
@@ -52,6 +52,10 @@ Position 0 (`POSITION_MOTHERBOARD`) is the motherboard itself. It has no I2C add
 | Reply (read) | 0x2F | `[flag][id_hi][id_lo][type][~flag][~id_hi][~id_lo][~type]` |
 
 The last four reply bytes are the bitwise inverse of the first four, which lets the motherboard detect a corrupted reply. For example, a seen board with ID 0x3AC7 and key switches replies `00 3A C7 01 FF C5 38 FE`.
+
+### Firmware version reply
+
+`RPT_FW_VERSION` (0x06), `[06][version]`, answers the PC's `0x11` command. The Firmware Driver Summary lists the command but no reply format, so this report type was added for it. The PC app must expect it.
 
 ### Open items in the file
 

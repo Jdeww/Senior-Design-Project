@@ -18,6 +18,7 @@ The function-level inputs and outputs are listed in [report_queue.h](report_queu
 | Detach | `[03][position][id_hi][id_lo]` |
 | Chain reset | `[04]` |
 | Chain complete | `[05][board count]` |
+| Firmware version | `[06][version]` |
 
 ## How it works
 

@@ -23,20 +23,27 @@ Defines the chain enumerator's interface: registering daughter boards in physica
 Call these from the main loop only, after `db_init()`. The [module manager](module_manager.c.md) makes these calls in the real firmware, in this pattern:
 
 ```c
+/* module_manager_init() */
 (void)db_init();
-needs_enumerating = !chain_enumerate();
+report_queue_clear();
+(void)report_push_chain_reset();
+s_needs_enumerating = !chain_enumerate();
 
-/* then every HELLO_INTERVAL_MS */
-if (needs_enumerating || (chain_append() == CHAIN_ERROR)) {
-    needs_enumerating = !chain_enumerate();
+/* module_manager_task(), every HELLO_INTERVAL_MS */
+if (s_needs_enumerating) {
+    s_needs_enumerating = !chain_enumerate();
+} else if (chain_append() == CHAIN_ERROR) {
+    restart_chain();    /* queues reports, then calls chain_enumerate() */
 }
 ```
 
+This is simplified: in the real code, `chain_enumerate()` is called through `run_enumeration()`, which also clears the held inputs and failure counts. When an earlier pass failed, the retry sends no new chain reset report, because one was already queued.
+
 | Use | Function | Effect on other boards |
 |---|---|---|
-| Startup, or after a board drops out | `chain_enumerate()` | Resets every board and re-registers the chain |
+| Startup, after a board drops out, or after `CHAIN_ERROR` | `chain_enumerate()` | Resets every board and re-registers the chain |
 | Checking for a board added at the end | `chain_append()` | None |
 
-After `CHAIN_ERROR`, the existing boards stay in the table, but the caller should call `chain_enumerate()` to rebuild it.
+After `CHAIN_ERROR`, the existing boards stay in the table, but the caller should rebuild it with `chain_enumerate()`. The module manager does this through `restart_chain()`. That function first queues a release for every held input and a chain reset report for the PC. It queues no detach, because no board has hit the failure limit. See [module_manager.c](module_manager.c.md).
 
 A new board blocks the main loop for about 24 ms while its database entry is written.

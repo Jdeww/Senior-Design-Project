@@ -2,7 +2,7 @@
 
 One page for each `.c` and `.h` file in `Drivers/`, in the same folder layout. Each page covers what the file does, its inputs and outputs, and how it works.
 
-**Status:** both firmwares build for the PIC18LF25K50 with XC8 v4.00. Nothing has run on hardware yet. In the simulator, the tick ran with the clock wait skipped, and the enumerator, database and module manager ran against fake boards, but the I2C drivers have not run at all. Each page's Testing section, where it has one, gives the details. Remaining work is in the [to-do list](TODO.md).
+**Status:** both firmwares build for the PIC18LF25K50 with XC8 v4.00, and the motherboard with its USB driver also builds with XC8 v3.10. Nothing has run on hardware yet. In the simulator, the tick ran with the clock wait skipped, and the enumerator, database and module manager ran against fake boards, but the I2C and USB drivers have not run at all. Each page's Testing section, where it has one, gives the details. Remaining work is in the [to-do list](TODO.md).
 
 ## Files
 
@@ -19,6 +19,11 @@ One page for each `.c` and `.h` file in `Drivers/`, in the same folder layout. E
 | [motherboard/main.c](motherboard/main.c.md) | Motherboard | Startup, interrupt handler and main loop |
 | [motherboard/module_manager.h](motherboard/module_manager.h.md) | Motherboard | Public interface of the module manager |
 | [motherboard/module_manager.c](motherboard/module_manager.c.md) | Motherboard | Polls boards, builds reports, and handles boards joining and dropping out |
+| [motherboard/usb_app.h](motherboard/usb_app.h.md) | Motherboard | Public interface of the USB connection to the PC |
+| [motherboard/usb_app.c](motherboard/usb_app.c.md) | Motherboard | Sends reports to the PC and runs its commands |
+| [motherboard/usb_config.h](motherboard/usb_config.h.md) | Motherboard | Settings for the MLA USB stack |
+| [motherboard/usb_descriptors.c](motherboard/usb_descriptors.c.md) | Motherboard | USB descriptors: vendor-defined HID, 8-byte reports |
+| [motherboard/mla_usb/](motherboard/mla_usb.md) | Motherboard | Microchip's USB device stack, copied unchanged |
 | [motherboard/report_queue.h](motherboard/report_queue.h.md) | Motherboard | Public interface of the queue of reports for the PC |
 | [motherboard/report_queue.c](motherboard/report_queue.c.md) | Motherboard | Stores reports in order and builds their bytes |
 | [motherboard/chain.h](motherboard/chain.h.md) | Motherboard | Public interface of the chain enumerator |
@@ -44,7 +49,7 @@ MOTHERBOARD                                 DAUGHTER BOARD
 main.c, key scanner (not written)           main.c, then input drivers (not written)
         |                                           |
 module_manager.c  -->  report_queue.c               |
-        |              (USB, not written)           |
+        |              usb_app.c --> mla_usb (PC)   |
 chain.c  <-->  daughter_db.c                        |
         |                                           |
 daughter_protocol.c                         i2c_slave.c  <-->  identity_stub.c (temporary)
@@ -75,10 +80,13 @@ Each firmware is its own build, with its own board folder on the include path.
 
 | Firmware | Source files | Include paths |
 |---|---|---|
-| Motherboard | `motherboard/main.c`, `module_manager.c`, `report_queue.c`, `chain.c`, `daughter_db.c`, `daughter_protocol.c`, `i2c_master.c`, `common/clock.c`, `common/eeprom.c`, `common/system_tick.c` | `Drivers`, `Drivers/motherboard` |
+| Motherboard | `motherboard/main.c`, `module_manager.c`, `report_queue.c`, `chain.c`, `daughter_db.c`, `daughter_protocol.c`, `i2c_master.c`, `usb_app.c`, `usb_descriptors.c`, `mla_usb/src/usb_device.c`, `mla_usb/src/usb_device_hid.c`, `common/clock.c`, `common/eeprom.c`, `common/system_tick.c` | `Drivers`, `Drivers/motherboard`, `Drivers/motherboard/mla_usb/inc`, `Drivers/motherboard/mla_usb/src` |
 | Daughter | `daughterboard/main.c`, `i2c_slave.c`, `identity_stub.c`, `common/clock.c`, `common/system_tick.c` | `Drivers`, `Drivers/daughterboard` |
 
-Includes are written from the `Drivers` folder, such as `"common/protocol.h"` or `"motherboard/chain.h"`. The one exception is `"board.h"` in the `common` source files. They build for both boards, so each build's board folder decides which `board.h` they get.
+Includes are written from the `Drivers` folder, such as `"common/protocol.h"` or `"motherboard/chain.h"`. There are two exceptions:
+
+- `"board.h"` in the `common` source files. They build for both boards, so each build's board folder decides which `board.h` they get.
+- The USB stack's headers, such as `"usb.h"` and `"usb_config.h"`. Microchip's files include them with no folder, so the stack's `inc` and `src` folders are on the include path, and `usb_config.h` sits in `Drivers/motherboard`.
 
 To build the scope test, also define `BRINGUP_TICK_PIN`.
 
@@ -88,10 +96,10 @@ To build the scope test, also define `BRINGUP_TICK_PIN`.
 - **Programmer:** `LVP` is off, so programming needs a programmer that supplies high voltage on MCLR.
 - **MCLR:** the reset pin is enabled, so the board needs a pull-up on it.
 - **VUSB3V3:** the design notes call for checking how this pin should be connected on the LF part, including on daughters that don't use USB.
+- **USB IDs:** the VID and PID in `usb_descriptors.c` are Microchip's demo values, fine for bench testing only.
 
 ## Not written yet
 
-- **USB driver:** sends reports to the PC, and handles its commands.
 - **Motherboard key scanner:** reads and debounces the motherboard's own key switches.
 - **Real identity storage:** replaces `identity_stub.c` with EEPROM storage and real random IDs.
 - **Input detection and input drivers:** read the ID resistor and the keys, encoder, slider or switches on each daughter.

@@ -24,6 +24,7 @@ The function-level inputs and outputs are listed in [module_manager.h](module_ma
 
 | When | Action |
 |---|---|
+| Every call, if the PC asked | Start the list modules replay |
 | Every call | Announce any boards the PC doesn't know about yet |
 | Every 5 ms | Read events from each announced board |
 | Every 100 ms | Look for a new board at the end of the chain, or retry enumeration if the last try failed |
@@ -37,6 +38,19 @@ A new board's attach report goes out, followed by its current state if it's a sl
 - **At most `SNAPSHOT_MAX` (8) states are read for each board,** whatever input count it reports, so a bad count can't stall the queue.
 
 After a full enumeration, a chain complete report follows the last attach. A board appended later gets only an attach.
+
+### Listing modules for the PC
+
+The PC's `0x10` command reaches this file through `module_manager_list_modules()`, which only sets a flag. On the next `module_manager_task()` call, `replay_layout()`:
+
+1. Queues a chain reset. If the queue is full, it tries again on the next call.
+2. Sets the announced count back to 0, and marks chain complete as due unless enumeration is still failing.
+
+The normal announcing step then sends every attach report and the slider and switch states again, followed by chain complete. Nothing happens on the bus apart from re-reading those states.
+
+Boards aren't polled until they're announced again, which keeps each attach report ahead of that board's events. Their events wait on the daughter boards in the meantime.
+
+Held inputs are left as they are. If a board drops out before it's been announced again, no release is sent for its held inputs, but the PC has already cleared its layout with the chain reset.
 
 ### Polling
 
@@ -104,4 +118,4 @@ The real `module_manager.c`, `report_queue.c`, `chain.c`, `daughter_db.c` and `e
 
 To confirm that these tests can catch real bugs, they were also run against six copies of this file with a bug added on purpose: wrong failure limit, wrong input type tracked as held, ignoring queue room, no detach, no announcing, and dropping events from a failed read. All six were caught.
 
-**Not tested:** real boards over a real bus, or real USB. The test files aren't in the repository.
+**Not tested:** real boards over a real bus, or real USB. The list modules replay was added after these tests and has only been built. The test files aren't in the repository.

@@ -30,6 +30,7 @@ static uint8_t  s_failures[CHAIN_MAX_POSITIONS];    /* failed polls in a row    
 static uint8_t  s_announced;                        /* boards the PC knows about */
 static bool     s_complete_due;
 static bool     s_needs_enumerating;
+static bool     s_replay_due;                       /* PC asked to list modules */
 static uint16_t s_last_poll;
 static uint16_t s_last_hello;
 
@@ -200,6 +201,24 @@ static void poll_boards(void)
     }
 }
 
+/* Sends the layout to the PC again by re-running the announcing step from the
+ * first board. Boards are not polled again until they have been re-announced,
+ * which keeps every board's attach report ahead of its events. */
+static void replay_layout(void)
+{
+    if (!report_push_chain_reset()) {
+        return;     /* queue full: try again on the next pass */
+    }
+    s_replay_due = false;
+    s_announced = 0u;
+    s_complete_due = !s_needs_enumerating;
+}
+
+void module_manager_list_modules(void)
+{
+    s_replay_due = true;
+}
+
 void module_manager_init(void)
 {
     /* If a write fails, the ID still works until the next reset, and the decision
@@ -218,6 +237,9 @@ void module_manager_task(void)
 {
     uint16_t now = tick_now();
 
+    if (s_replay_due) {
+        replay_layout();
+    }
     announce_boards();
 
     if ((uint16_t)(now - s_last_poll) >= POLL_INTERVAL_MS) {

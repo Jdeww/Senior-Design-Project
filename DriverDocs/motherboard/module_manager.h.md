@@ -13,6 +13,7 @@ Defines the two calls that keep the chain running: polling each board for events
 |---|---|---|
 | `module_manager_init()` | None | None. Loads the database and registers the chain. |
 | `module_manager_task()` | None | None. Runs whatever work is due. |
+| `module_manager_list_modules()` | None | None. Asks for the PC's list modules replay: a chain reset, every attach report and slider and switch state, then chain complete. It runs on a later `module_manager_task()` call. |
 
 Its results reach the rest of the firmware as reports in the [report queue](report_queue.h.md).
 
@@ -31,3 +32,5 @@ for (;;) {
 ```
 
 Call `module_manager_init()` once, with the tick running and interrupts on. Then call `module_manager_task()` on every main loop pass. It does its own timing, so it's safe to call as often as possible.
+
+[usb_app.c](usb_app.c.md) calls `module_manager_list_modules()` when the PC sends command `0x10`.

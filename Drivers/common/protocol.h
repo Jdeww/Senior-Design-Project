@@ -122,6 +122,7 @@
 #define RPT_DETACH                  0x03u   /* [03][pos][id_hi][id_lo]       */
 #define RPT_CHAIN_RESET             0x04u   /* [04]                          */
 #define RPT_CHAIN_COMPLETE          0x05u   /* [05][board count]             */
+#define RPT_FW_VERSION              0x06u   /* [06][version], answers 0x11   */
 
 /* PC -> device (OUT) commands */
 #define CMD_LIST_MODULES            0x10u

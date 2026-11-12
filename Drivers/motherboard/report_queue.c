@@ -73,6 +73,11 @@ bool report_push_chain_complete(uint8_t board_count)
     return push(RPT_CHAIN_COMPLETE, board_count, 0u, 0u, 0u, 0u);
 }
 
+bool report_push_fw_version(uint8_t version)
+{
+    return push(RPT_FW_VERSION, version, 0u, 0u, 0u, 0u);
+}
+
 bool report_queue_pop(uint8_t *out)
 {
     const uint8_t *slot;

@@ -30,13 +30,15 @@ These need the schematic or datasheet, and getting them wrong could stop a board
 - [x] **Daughter database.** Written and tested in the simulator. See [daughter_db.c](motherboard/daughter_db.c.md).
 - [x] **Polling schedule.** Written and tested against fake boards. See [module_manager.c](motherboard/module_manager.c.md).
 - [x] **Module manager and event aggregator.** Written and tested against fake boards, in the same file.
-- [ ] **USB driver.** The USB core and HID class from Microchip's MLA stack, connected to `main.c`.
-  - Drain the [report queue](motherboard/report_queue.h.md), one report per host poll. Until this exists, the queue stays full after 40 reports.
-  - Handle the PC commands: `0x10` (list modules) needs a way to replay the chain reset, attach reports, states and chain complete, and `0x11` returns the firmware version.
-  - Check USB timing against the main loop's blocking work: up to about 24 ms per new board for EEPROM writes, and up to about 13 ms for a poll pass with four full event queues.
+- [x] **USB driver.** Written and builds. See [usb_app.c](motherboard/usb_app.c.md) and [mla_usb](motherboard/mla_usb.md). Microchip's stack runs in the high-priority interrupt, so the main loop's blocking work doesn't delay the PC's control requests. Only reports wait.
+- [ ] **USB follow-ups.**
+  - Replace the placeholder VID/PID (Microchip's demo pair) with a sublicensed PID, and set the real maximum current in [usb_descriptors.c](motherboard/usb_descriptors.c.md).
+  - Decide on suspend. The USB specification limits a suspended device to 2.5 mA, and the firmware currently keeps running. Most PCs rarely suspend a HID device, but the chain could still be powered down, or its polling stopped, while suspended.
+  - Tell the PC app about the firmware version reply: `[06][version]`, added as `RPT_FW_VERSION`.
+  - Reports move only when the main loop runs, so a new board's EEPROM writes (about 24 ms) or a poll pass with four full queues (about 13 ms) delays them. Confirm the delay is acceptable once it runs.
 - [ ] **Key scanner.** The motherboard has key switches of its own, with no other input types. Scan and debounce them (`KEY_DEBOUNCE_SCANS`, 5 matching 1 ms scans), detect edges, and report each change as `[01][00][index][value]`.
   - Get the key count and pins from the schematic.
-  - Decide whether position 0 gets an attach report, and how it's handled in the `0x10` replay, since the PC clears its layout on a chain reset.
+  - Decide whether position 0 gets an attach report, and add it to the `0x10` replay in `replay_layout()` if so, since the PC clears its layout on a chain reset.
   - Don't lose key changes when the report queue is full. `restart_chain()` can also empty the queue, and its build-time room check only counts daughter boards.
   - Keep scanning on time during the main loop's blocking work (see the USB driver's timing check above).
 - [ ] **Unused pins.** The design says to drive unused pins low at boot, which isn't done yet because it needs the final pin list from the schematic.
@@ -52,7 +54,10 @@ These need the schematic or datasheet, and getting them wrong could stop a board
 
 ## 5. Tests once the I2C traffic is running
 
-The I2C drivers have only been compiled so far, and have not run on hardware or in a simulator.
+The I2C and USB drivers have only been compiled so far, and have not run on hardware or in a simulator.
+
+- [ ] **Test USB enumeration.** Plug in the motherboard and confirm the PC finds a HID device with VID 0x04D8 and PID 0x003F, including while boards are being registered. If enumeration fails, check the clock first: active clock tuning only locks once the PC is sending frames.
+- [ ] **Test the reports and commands** with a small hidapi script: the boot reports, key events, `0x10` replaying the layout, and `0x11` answering `[06][01]`.
 
 - [ ] **Test the full handshake** with a logic analyzer, including REGENERATE and re-enumeration. The enumerator has only run against fake boards, so this is the first time it talks to real daughter firmware.
 - [ ] **Check the motherboard ID on real boards.** Read it after first boot on a few boards to confirm they differ, because the simulator can't produce real ADC noise.
@@ -77,6 +82,7 @@ The I2C drivers have only been compiled so far, and have not run on hardware or 
 - [ ] **Firmware Driver Summary, bus speed.** It says 400 kHz. The code uses 100 kHz, which matches the Driver Summary.
 - [ ] **Firmware Driver Summary, motherboard inputs.** It says the key scanner, debounce and edge detection were removed from the motherboard, and lists its inputs as an open question. The motherboard keeps them for its own key switches, which matches the Driver Summary.
 - [ ] **Keystroke diagram, bus recovery.** It shows recovery on "NACK or timeout". The code recovers on a timeout or collision, not on a NACK, because HELLO gets a NACK at the end of the chain every 100 ms.
+- [ ] **Firmware Driver Summary, firmware version reply.** It lists command `0x11` but no reply. The code answers with a new report type, `[06][version]`.
 - [ ] **`DriverDocs` pages.** These don't update automatically, so edit them whenever the drivers change.
 
 ## 8. Development setup

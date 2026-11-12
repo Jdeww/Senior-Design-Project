@@ -5,7 +5,7 @@ Implementation: [report_queue.c](report_queue.c.md)
 
 ## What it does
 
-Defines the queue of reports waiting to go to the PC. The PC only collects a report when it polls, once every 1 ms, so bursts such as the attach reports during enumeration wait here. The USB driver, which isn't written yet, will drain it.
+Defines the queue of reports waiting to go to the PC. The PC only collects a report when it polls, once every 1 ms, so bursts such as the attach reports during enumeration wait here. [usb_app.c](usb_app.c.md) drains it.
 
 ## Inputs and outputs
 
@@ -18,6 +18,7 @@ Defines the queue of reports waiting to go to the PC. The PC only collects a rep
 | `report_push_detach(position, id)` | Board position and ID | `false` if the queue is full |
 | `report_push_chain_reset()` | None | `false` if the queue is full |
 | `report_push_chain_complete(board_count)` | Number of boards | `false` if the queue is full |
+| `report_push_fw_version(version)` | Firmware version | `false` if the queue is full |
 | `report_queue_pop(out)` | A buffer of `USB_REPORT_LEN` (8) bytes | `false` if the queue is empty; otherwise the oldest report is in `out` |
 
 `REPORT_QUEUE_DEPTH` is 40.
@@ -26,14 +27,12 @@ Defines the queue of reports waiting to go to the PC. The PC only collects a rep
 
 Call everything from the main loop. When a push returns `false`, nothing is added.
 
-The USB driver should send reports like this on each main loop pass:
+`usb_app_task()` sends reports like this on each main loop pass, popping straight into the USB endpoint buffer:
 
 ```c
-uint8_t report[USB_REPORT_LEN];
-
-if (usb_ready_to_send() && report_queue_pop(report)) {
-    usb_send(report);
+if (!HIDTxHandleBusy(s_in_handle)) {
+    if (report_queue_pop((uint8_t *)s_in_buffer)) {
+        send_in();
+    }
 }
 ```
-
-`usb_ready_to_send()` and `usb_send()` stand for functions the USB driver will provide.

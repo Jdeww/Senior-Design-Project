@@ -23,6 +23,7 @@ bool report_push_attach(uint8_t position, uint16_t id, uint8_t type, uint8_t inp
 bool report_push_detach(uint8_t position, uint16_t id);
 bool report_push_chain_reset(void);
 bool report_push_chain_complete(uint8_t board_count);
+bool report_push_fw_version(uint8_t version);
 
 /* Copies the oldest report into out, which must hold USB_REPORT_LEN bytes, with
  * unused bytes set to 0. Returns false if the queue is empty. */
